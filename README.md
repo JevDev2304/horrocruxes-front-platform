@@ -12,9 +12,6 @@ Harry Potter themed chat app. Talk with iconic HP characters powered by a multia
 
 - Angular 19 · Tailwind CSS · Lucide icons
 - AWS Cognito (authentication)
-- FastAPI + PostgreSQL (backend — see `SDD_BACKEND.md`)
-- NVIDIA API / Gemma 4 31B (LLM with tool use)
-- Lambda multiagent system (deep HP knowledge base)
 
 ## Setup
 
