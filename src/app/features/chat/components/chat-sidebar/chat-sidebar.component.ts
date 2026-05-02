@@ -1,9 +1,9 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../../../core/auth/services/auth.service';
-import { HP_CHARACTERS, HpCharacter } from '../../../../shared/models/chat.model';
+import { CharacterService } from '../../../../core/services/character.service';
 
 @Component({
   selector: 'app-chat-sidebar',
@@ -12,19 +12,20 @@ import { HP_CHARACTERS, HpCharacter } from '../../../../shared/models/chat.model
   templateUrl: './chat-sidebar.component.html',
 })
 export class ChatSidebarComponent {
-  private chatService = inject(ChatService);
-  private authService = inject(AuthService);
-  private router      = inject(Router);
+  private chatService      = inject(ChatService);
+  private authService      = inject(AuthService);
+  private characterService = inject(CharacterService);
+  private router           = inject(Router);
 
   readonly chats      = this.chatService.sortedChats;
   readonly activeChat = this.chatService.activeChat;
-  readonly characters = HP_CHARACTERS;
+  readonly characters = this.characterService.characters;
 
   showCharacterPicker = signal(false);
   deletingId          = signal<string | null>(null);
 
-  newChat(character: HpCharacter = 'dumbledore'): void {
-    const chat = this.chatService.createChat(character);
+  newChat(characterId: string = 'dumbledore'): void {
+    const chat = this.chatService.createChat(characterId);
     this.showCharacterPicker.set(false);
     this.router.navigate(['/chat', chat.id]);
   }
@@ -51,8 +52,8 @@ export class ChatSidebarComponent {
     this.router.navigate(['/auth/login']);
   }
 
-  getCharacter(key: HpCharacter) {
-    return HP_CHARACTERS[key];
+  getCharacter(id: string) {
+    return this.characterService.getById(id);
   }
 
   formatDate(iso: string): string {
@@ -64,6 +65,4 @@ export class ChatSidebarComponent {
     if (diffH < 168) return d.toLocaleDateString('es', { weekday: 'short' });
     return d.toLocaleDateString('es', { day: '2-digit', month: 'short' });
   }
-
-  characterKeys = Object.keys(HP_CHARACTERS) as HpCharacter[];
 }

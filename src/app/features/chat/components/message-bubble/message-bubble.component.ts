@@ -1,6 +1,7 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
-import { HP_CHARACTERS, HpCharacter, Message } from '../../../../shared/models/chat.model';
+import { Message } from '../../../../shared/models/chat.model';
+import { CharacterService } from '../../../../core/services/character.service';
 
 @Component({
   selector: 'app-message-bubble',
@@ -13,8 +14,8 @@ import { HP_CHARACTERS, HpCharacter, Message } from '../../../../shared/models/c
     >
       <!-- Avatar (solo bot) -->
       @if (message().role === 'assistant') {
-        <div class="w-8 h-8 rounded-full bg-hp-border/60 flex items-center justify-center flex-shrink-0 mb-0.5">
-          <lucide-icon [name]="characters[character()].icon" class="w-4 h-4 text-hp-gold"></lucide-icon>
+        <div class="w-8 h-8 rounded-full bg-hp-border/60 flex-shrink-0 mb-0.5 overflow-hidden">
+          <img [src]="characterIcon()" [alt]="character()" class="w-full h-full object-cover" />
         </div>
       }
 
@@ -31,9 +32,19 @@ import { HP_CHARACTERS, HpCharacter, Message } from '../../../../shared/models/c
         [class.text-gray-100]="message().role === 'assistant'"
         [class.rounded-bl-sm]="message().role === 'assistant'"
       >
-        {{ message().content }}
+        {{ mainText() }}
+
+        @if (sources().length > 0) {
+          <div class="mt-3 pt-3 border-t border-hp-border/50">
+            <p class="text-[10px] text-hp-muted font-heading tracking-wider uppercase mb-1.5">📚 Sources</p>
+            @for (source of sources(); track source) {
+              <p class="text-[10px] text-hp-muted/70 leading-relaxed">• {{ source }}</p>
+            }
+          </div>
+        }
+
         <p
-          class="text-[10px] mt-1 opacity-60"
+          class="text-[10px] mt-2 opacity-60"
           [class.text-right]="message().role === 'user'"
         >
           {{ formatTime(message().createdAt) }}
@@ -43,10 +54,31 @@ import { HP_CHARACTERS, HpCharacter, Message } from '../../../../shared/models/c
   `,
 })
 export class MessageBubbleComponent {
-  message   = input.required<Message>();
-  character = input.required<HpCharacter>();
+  private characterService = inject(CharacterService);
 
-  readonly characters = HP_CHARACTERS;
+  message   = input.required<Message>();
+  character = input.required<string>();
+
+  characterIcon(): string {
+    return this.characterService.getById(this.character())?.icon ?? 'wand-sparkles';
+  }
+
+  mainText(): string {
+    const content = this.message().content;
+    const idx = content.indexOf('\n\n📚 Sources');
+    return idx !== -1 ? content.slice(0, idx).trim() : content;
+  }
+
+  sources(): string[] {
+    const content = this.message().content;
+    const idx = content.indexOf('\n\n📚 Sources');
+    if (idx === -1) return [];
+    return content
+      .slice(idx)
+      .split('\n')
+      .filter(l => l.trim().startsWith('•'))
+      .map(l => l.trim().replace(/^•\s*/, ''));
+  }
 
   formatTime(iso: string): string {
     return new Date(iso).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });

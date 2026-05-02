@@ -30,3 +30,7 @@ npm-debug.log*
 
 # Claude Code
 .claude/launch.json
+
+# Internal docs
+SDD*.md
+contexto_front.md

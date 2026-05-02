@@ -1,7 +1,8 @@
-import { Component, input, output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, input, output } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { QuizResult } from '../../../../shared/models/quiz.model';
+import { ChatService } from '../../../chat/services/chat.service';
 
 const CASA_COLORS: Record<string, { bg: string; text: string; border: string; icon: string }> = {
   Gryffindor: { bg: 'bg-red-900/20',    text: 'text-red-400',    border: 'border-red-700/40',    icon: 'shield' },
@@ -17,10 +18,19 @@ const CASA_COLORS: Record<string, { bg: string; text: string; border: string; ic
   templateUrl: './quiz-result.component.html',
 })
 export class QuizResultComponent {
+  private chatService = inject(ChatService);
+  private router      = inject(Router);
+
   result = input.required<QuizResult>();
   retake = output<void>();
 
   getCasaStyle(casa: string) {
     return CASA_COLORS[casa] ?? CASA_COLORS['Gryffindor'];
+  }
+
+  startChat(): void {
+    const characterId = this.result().character_id || 'dumbledore';
+    const chat = this.chatService.createChat(characterId);
+    this.router.navigate(['/chat', chat.id]);
   }
 }
