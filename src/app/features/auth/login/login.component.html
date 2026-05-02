@@ -66,9 +66,6 @@
           <p class="error-msg" [class.invisible]="!(password.invalid && password.touched)">Minimum 8 characters.</p>
         </div>
 
-        <div class="flex justify-end">
-          <a routerLink="/auth/confirm" class="hp-btn-ghost text-xs">Forgot your password?</a>
-        </div>
 
         <button type="submit" [disabled]="loading()" class="hp-btn-primary mt-2">
           @if (loading()) {

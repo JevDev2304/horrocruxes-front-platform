@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Chat, HpCharacter, Message, SendMessageResponse } from '../../../shared/models/chat.model';
+import { BackendChatTurnResponse, Chat, HpCharacter, Message } from '../../../shared/models/chat.model';
 import { environment } from '../../../../environments/environment';
 
 const CHATS_KEY    = 'hp_chats';
@@ -85,20 +85,26 @@ export class ChatService {
 
     try {
       const res = await firstValueFrom(
-        this.http.post<SendMessageResponse>(
-          `${environment.apiUrl}/chats/${chatId}/messages`,
-          { content, character: chat.character },
+        this.http.post<BackendChatTurnResponse>(
+          `${environment.apiUrl}/chat/message`,
+          { content, chat_id: chat.backendChatId ?? null, user_id: null, character: chat.character },
         ),
       );
-      this.appendMessage(chatId, res.botMessage);
-    } catch {
-      // Mock while the backend isn't ready
+
+      // Persist backend chat_id for continuity of conversation
+      if (!chat.backendChatId) {
+        const updated = this._chats().map((c) =>
+          c.id === chatId ? { ...c, backendChatId: res.chat_id } : c,
+        );
+        this.persistChats(updated);
+      }
+
       const botMsg: Message = {
-        id:        crypto.randomUUID(),
+        id:        String(res.assistant_message.id),
         chatId,
         role:      'assistant',
-        content:   '🧙‍♂️ The backend is still under construction... but soon I\'ll respond with all the magic of Hogwarts.',
-        createdAt: new Date().toISOString(),
+        content:   res.assistant_message.content,
+        createdAt: res.assistant_message.created_at,
       };
       this.appendMessage(chatId, botMsg);
     } finally {

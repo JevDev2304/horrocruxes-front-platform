@@ -1,7 +1,7 @@
 import { Component, OnDestroy, computed, effect, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { ChatService } from '../../services/chat.service';
-import { HP_CHARACTERS } from '../../../../shared/models/chat.model';
+import { CharacterService } from '../../../../core/services/character.service';
 import { MessageBubbleComponent } from '../message-bubble/message-bubble.component';
 import { ChatInputComponent } from '../chat-input/chat-input.component';
 
@@ -52,11 +52,15 @@ const WAITING_PHRASES = [
 export class ChatWindowComponent implements OnDestroy {
   @ViewChild('messageList') messageList!: ElementRef<HTMLDivElement>;
 
-  private chatService = inject(ChatService);
+  private chatService      = inject(ChatService);
+  private characterService = inject(CharacterService);
 
   readonly activeChat = this.chatService.activeChat;
   readonly sending    = this.chatService.sending;
-  readonly characters = HP_CHARACTERS;
+
+  getCharacter(id: string) {
+    return this.characterService.getById(id);
+  }
   readonly waitingPhrase = signal('');
 
   private phraseInterval: ReturnType<typeof setInterval> | null = null;

@@ -20,6 +20,8 @@ export interface QuizResult {
   match_percentage: number;
   traits: string[];
   quote: string;
+  icon?: string;
+  character_id?: string;
 }
 
 export const QUIZ_OPTIONS = {

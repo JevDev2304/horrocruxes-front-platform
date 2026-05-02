@@ -1,12 +1,11 @@
-export type HpCharacter = 'dumbledore' | 'hermione' | 'ron' | 'snape' | 'luna';
+export type HpCharacter = string;
 
-export const HP_CHARACTERS: Record<HpCharacter, { label: string; description: string; icon: string }> = {
-  dumbledore: { label: 'Albus Dumbledore', description: 'Wise, philosophical, enigmatic', icon: 'wand-sparkles' },
-  hermione:   { label: 'Hermione Granger', description: 'Precise, intelligent, thorough', icon: 'book-open' },
-  ron:        { label: 'Ron Weasley',       description: 'Casual, funny, loyal', icon: 'shield' },
-  snape:      { label: 'Severus Snape',     description: 'Sarcastic, brilliant, cold', icon: 'moon' },
-  luna:       { label: 'Luna Lovegood',     description: 'Dreamy, peculiar, clever', icon: 'star' },
-};
+export interface Character {
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+}
 
 export interface Chat {
   id: string;
@@ -14,6 +13,7 @@ export interface Chat {
   character: HpCharacter;
   createdAt: string;
   lastMessageAt: string;
+  backendChatId?: number;
 }
 
 export interface Message {
@@ -24,12 +24,17 @@ export interface Message {
   createdAt: string;
 }
 
-export interface SendMessageRequest {
+export interface BackendMessageOut {
+  id: number;
+  chat_id: number;
+  role: 'user' | 'assistant';
   content: string;
-  character: HpCharacter;
+  trace_id: string | null;
+  created_at: string;
 }
 
-export interface SendMessageResponse {
-  userMessage: Message;
-  botMessage: Message;
+export interface BackendChatTurnResponse {
+  chat_id: number;
+  user_message: BackendMessageOut;
+  assistant_message: BackendMessageOut;
 }

@@ -1,9 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 import {
   CognitoIdentityProviderClient,
-  ConfirmForgotPasswordCommand,
   ConfirmSignUpCommand,
-  ForgotPasswordCommand,
   GetUserCommand,
   GlobalSignOutCommand,
   InitiateAuthCommand,
@@ -91,26 +89,6 @@ export class AuthService {
     const token = this.getAccessToken();
     if (!token) throw new Error('Not authenticated');
     return this.client.send(new GetUserCommand({ AccessToken: token }));
-  }
-
-  async forgotPassword(email: string): Promise<void> {
-    await this.client.send(
-      new ForgotPasswordCommand({
-        ClientId: environment.cognito.clientId,
-        Username: email,
-      }),
-    );
-  }
-
-  async confirmForgotPassword(email: string, code: string, newPassword: string): Promise<void> {
-    await this.client.send(
-      new ConfirmForgotPasswordCommand({
-        ClientId: environment.cognito.clientId,
-        Username: email,
-        ConfirmationCode: code,
-        Password: newPassword,
-      }),
-    );
   }
 
   async signOut(): Promise<void> {

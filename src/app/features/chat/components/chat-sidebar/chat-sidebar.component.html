@@ -19,16 +19,16 @@
 
       <!-- Character picker dropdown -->
       @if (showCharacterPicker()) {
-        <div class="absolute top-full left-0 right-0 mt-1 bg-hp-raised border border-hp-border rounded-lg shadow-xl z-10 overflow-hidden animate-fade-in">
-          @for (key of characterKeys; track key) {
+        <div class="absolute top-full left-0 right-0 mt-1 bg-hp-raised border border-hp-border rounded-lg shadow-xl z-10 animate-fade-in max-h-72 overflow-y-auto">
+          @for (char of characters(); track char.id) {
             <button
-              (click)="newChat(key)"
+              (click)="newChat(char.id)"
               class="w-full flex items-center gap-3 px-4 py-3 hover:bg-hp-surface text-left transition-colors duration-150"
             >
-              <lucide-icon [name]="characters[key].icon" class="w-5 h-5"></lucide-icon>
+              <img [src]="char.icon" [alt]="char.label" class="w-10 h-10 rounded-full object-cover flex-shrink-0" />
               <div>
-                <p class="text-sm text-gray-200 font-medium">{{ characters[key].label }}</p>
-                <p class="text-xs text-hp-muted">{{ characters[key].description }}</p>
+                <p class="text-sm text-gray-200 font-medium">{{ char.label }}</p>
+                <p class="text-xs text-hp-muted">{{ char.description }}</p>
               </div>
             </button>
           }
@@ -56,15 +56,15 @@
         class="group flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-hp-raised transition-all duration-200 mx-1 rounded-lg"
       >
         <!-- Character avatar -->
-        <div class="w-9 h-9 rounded-full bg-hp-border flex items-center justify-center flex-shrink-0">
-          <lucide-icon [name]="getCharacter(chat.character).icon" class="w-5 h-5 text-hp-dark"></lucide-icon>
+        <div class="w-9 h-9 rounded-full bg-hp-border flex items-center justify-center flex-shrink-0 overflow-hidden">
+          <img [src]="getCharacter(chat.character)?.icon" [alt]="getCharacter(chat.character)?.label" class="w-full h-full object-cover" />
         </div>
 
         <!-- Chat info -->
         <div class="flex-1 min-w-0">
           <p class="text-sm text-gray-200 truncate font-medium">{{ chat.title }}</p>
           <p class="text-xs text-hp-muted truncate">
-            {{ getCharacter(chat.character).label }} · {{ formatDate(chat.lastMessageAt) }}
+            {{ getCharacter(chat.character)?.label }} · {{ formatDate(chat.lastMessageAt) }}
           </p>
         </div>
 
