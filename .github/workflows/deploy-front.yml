@@ -31,7 +31,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      # 🔥 Upload static assets with long cache
+      # Upload static assets with long cache
       - name: Upload static assets
         run: |
           aws s3 sync dist/horrocruxes/browser/ s3://horrocruxes-harrypotter-rag.me \
@@ -39,7 +39,7 @@ jobs:
             --exclude "index.html" \
             --cache-control "max-age=31536000,public"
       
-      # 🔥 Upload index.html with no cache
+      # Upload index.html with no cache
       - name: Upload index.html
         run: |
           aws s3 cp dist/horrocruxes/browser/index.html \
