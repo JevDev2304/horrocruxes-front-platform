@@ -1,4 +1,36 @@
 <div class="flex h-screen bg-hp-dark overflow-hidden">
-  <app-chat-sidebar class="flex-shrink-0" />
-  <app-chat-window class="flex-1 min-w-0" />
+
+  <!-- Sidebar desktop: siempre visible en lg+ -->
+  <div class="hidden lg:flex flex-shrink-0">
+    <app-chat-sidebar />
+  </div>
+
+  <!-- Sidebar móvil/tablet: siempre montada, entra/sale con CSS -->
+  <div
+    class="fixed inset-0 z-50 lg:hidden flex"
+    [class.pointer-events-none]="!sidebarOpen()"
+  >
+    <!-- Sidebar panel -->
+    <div
+      class="flex-shrink-0 transition-transform duration-300 ease-out"
+      [class.-translate-x-full]="!sidebarOpen()"
+    >
+      <app-chat-sidebar (close)="sidebarOpen.set(false)" />
+    </div>
+    <!-- Backdrop -->
+    <div
+      class="flex-1 transition-opacity duration-300"
+      [class.opacity-0]="!sidebarOpen()"
+      [class.pointer-events-none]="!sidebarOpen()"
+      (click)="sidebarOpen.set(false)"
+      style="background:rgba(0,0,0,0.6)"
+    ></div>
+  </div>
+
+  <!-- Chat -->
+  <app-chat-window
+    class="flex-1 min-w-0"
+    (toggleSidebar)="toggleSidebar()"
+  />
+
 </div>

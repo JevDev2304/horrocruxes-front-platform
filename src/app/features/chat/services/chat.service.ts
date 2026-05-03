@@ -11,14 +11,20 @@ const MESSAGES_KEY = 'hp_messages';
 export class ChatService {
   private http = inject(HttpClient);
 
-  private readonly _chats      = signal<Chat[]>(this.loadChats());
-  private readonly _activeChat = signal<Chat | null>(null);
-  private readonly _messages   = signal<Record<string, Message[]>>(this.loadMessages());
-  private readonly _sending    = signal(false);
+  private readonly _chats        = signal<Chat[]>(this.loadChats());
+  private readonly _activeChat   = signal<Chat | null>(null);
+  private readonly _messages     = signal<Record<string, Message[]>>(this.loadMessages());
+  private readonly _sendingChats = signal<Record<string, boolean>>({});
 
-  readonly chats      = this._chats.asReadonly();
-  readonly activeChat = this._activeChat.asReadonly();
-  readonly sending    = this._sending.asReadonly();
+  readonly chats        = this._chats.asReadonly();
+  readonly activeChat   = this._activeChat.asReadonly();
+  /** Reactive map of chatId → sending state. Use isSending(chatId) in templates. */
+  readonly sendingChats = this._sendingChats.asReadonly();
+  /** Returns true while the given chat is waiting for a backend response. */
+  isSending(chatId: string): boolean {
+    return !!this._sendingChats()[chatId];
+  }
+
   readonly sortedChats = computed(() =>
     [...this._chats()].sort(
       (a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime(),
@@ -46,6 +52,14 @@ export class ChatService {
     this.persistChats([chat, ...this._chats()]);
     this._activeChat.set(chat);
     return chat;
+  }
+
+  clearSession(): void {
+    localStorage.removeItem(CHATS_KEY);
+    localStorage.removeItem(MESSAGES_KEY);
+    this._chats.set([]);
+    this._messages.set({});
+    this._activeChat.set(null);
   }
 
   deleteChat(chatId: string): void {
@@ -81,7 +95,7 @@ export class ChatService {
     };
     this.appendMessage(chatId, userMsg);
     this.autoTitle(chatId, content);
-    this._sending.set(true);
+    this._sendingChats.update((s) => ({ ...s, [chatId]: true }));
 
     try {
       const res = await firstValueFrom(
@@ -108,7 +122,7 @@ export class ChatService {
       };
       this.appendMessage(chatId, botMsg);
     } finally {
-      this._sending.set(false);
+      this._sendingChats.update((s) => { const n = { ...s }; delete n[chatId]; return n; });
       this.touchChat(chatId);
     }
   }

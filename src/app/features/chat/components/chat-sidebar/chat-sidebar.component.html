@@ -5,6 +5,13 @@
     <div class="flex items-center gap-2 mb-4">
       <lucide-icon name="zap" class="w-6 h-6 text-hp-gold"></lucide-icon>
       <span class="font-heading text-hp-gold tracking-wider text-lg">Horrocruxes</span>
+      <button
+        (click)="close.emit()"
+        class="ml-auto p-1 rounded text-hp-muted hover:text-gray-100 transition-colors lg:hidden"
+        title="Close menu"
+      >
+        <lucide-icon name="x" class="w-5 h-5"></lucide-icon>
+      </button>
     </div>
 
     <!-- New chat button -->
@@ -17,7 +24,6 @@
         New conversation
       </button>
 
-      <!-- Character picker dropdown -->
       @if (showCharacterPicker()) {
         <div class="absolute top-full left-0 right-0 mt-1 bg-hp-raised border border-hp-border rounded-lg shadow-xl z-10 animate-fade-in max-h-72 overflow-y-auto">
           @for (char of characters(); track char.id) {
@@ -55,20 +61,15 @@
         [class.opacity-0]="deletingId() === chat.id"
         class="group flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-hp-raised transition-all duration-200 mx-1 rounded-lg"
       >
-        <!-- Character avatar -->
         <div class="w-9 h-9 rounded-full bg-hp-border flex items-center justify-center flex-shrink-0 overflow-hidden">
           <img [src]="getCharacter(chat.character)?.icon" [alt]="getCharacter(chat.character)?.label" class="w-full h-full object-cover" />
         </div>
-
-        <!-- Chat info -->
         <div class="flex-1 min-w-0">
           <p class="text-sm text-gray-200 truncate font-medium">{{ chat.title }}</p>
           <p class="text-xs text-hp-muted truncate">
             {{ getCharacter(chat.character)?.label }} · {{ formatDate(chat.lastMessageAt) }}
           </p>
         </div>
-
-        <!-- Delete button -->
         <button
           (click)="deleteChat($event, chat.id)"
           class="opacity-0 group-hover:opacity-100 text-hp-muted hover:text-red-400 transition-all duration-200 p-1 rounded flex-shrink-0"

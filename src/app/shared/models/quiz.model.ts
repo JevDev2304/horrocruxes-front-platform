@@ -17,7 +17,6 @@ export interface QuizResult {
   personaje: string;
   casa: string;
   descripcion: string;
-  match_percentage: number;
   traits: string[];
   quote: string;
   icon?: string;

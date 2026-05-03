@@ -1,4 +1,4 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   CognitoIdentityProviderClient,
   ConfirmSignUpCommand,
@@ -9,6 +9,7 @@ import {
   type AuthenticationResultType,
 } from '@aws-sdk/client-cognito-identity-provider';
 import { environment } from '../../../../environments/environment';
+import { ChatService } from '../../../features/chat/services/chat.service';
 
 interface StoredTokens {
   accessToken: string;
@@ -25,6 +26,7 @@ export class AuthService {
     region: environment.cognito.region,
   });
 
+  private readonly chatService = inject(ChatService);
   private readonly _tokens = signal<StoredTokens | null>(this.loadFromStorage());
 
   readonly isAuthenticated = computed(() => {
@@ -134,6 +136,7 @@ export class AuthService {
   private clear(): void {
     localStorage.removeItem(TOKENS_KEY);
     this._tokens.set(null);
+    this.chatService.clearSession();
   }
 
   private loadFromStorage(): StoredTokens | null {

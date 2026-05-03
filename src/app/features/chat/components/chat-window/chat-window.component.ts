@@ -1,4 +1,4 @@
-import { Component, OnDestroy, computed, effect, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { Component, OnDestroy, computed, effect, ElementRef, inject, output, signal, ViewChild } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { ChatService } from '../../services/chat.service';
 import { CharacterService } from '../../../../core/services/character.service';
@@ -55,8 +55,15 @@ export class ChatWindowComponent implements OnDestroy {
   private chatService      = inject(ChatService);
   private characterService = inject(CharacterService);
 
+  toggleSidebar = output<void>();
+
   readonly activeChat = this.chatService.activeChat;
-  readonly sending    = this.chatService.sending;
+
+  /** True only while the currently visible chat is waiting for a response. */
+  readonly sending = computed(() => {
+    const chat = this.activeChat();
+    return chat ? !!this.chatService.sendingChats()[chat.id] : false;
+  });
 
   getCharacter(id: string) {
     return this.characterService.getById(id);
