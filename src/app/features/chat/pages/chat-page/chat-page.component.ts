@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, input } from '@angular/core';
+import { Component, OnInit, inject, input, signal } from '@angular/core';
 import { ChatService } from '../../services/chat.service';
 import { ChatSidebarComponent } from '../../components/chat-sidebar/chat-sidebar.component';
 import { ChatWindowComponent } from '../../components/chat-window/chat-window.component';
@@ -12,7 +12,12 @@ import { ChatWindowComponent } from '../../components/chat-window/chat-window.co
 export class ChatPageComponent implements OnInit {
   private chatService = inject(ChatService);
 
-  chatId = input<string | undefined>(undefined);
+  chatId      = input<string | undefined>(undefined);
+  sidebarOpen = signal(false);
+
+  toggleSidebar(): void {
+    this.sidebarOpen.update(v => !v);
+  }
 
   ngOnInit(): void {
     const id = this.chatId();

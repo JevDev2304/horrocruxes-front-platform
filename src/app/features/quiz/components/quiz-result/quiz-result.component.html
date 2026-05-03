@@ -21,20 +21,6 @@
       {{ result().casa }} House
     </div>
 
-    <!-- Compatibility bar -->
-    <div class="mb-5">
-      <div class="flex justify-between items-center mb-2">
-        <span class="text-xs text-hp-muted">Match</span>
-        <span class="text-sm font-bold text-hp-gold font-heading">{{ result().match_percentage }}%</span>
-      </div>
-      <div class="h-2 bg-hp-raised rounded-full overflow-hidden">
-        <div
-          class="h-full bg-gradient-to-r from-hp-gold/60 to-hp-gold rounded-full transition-all duration-1000"
-          [style.width.%]="result().match_percentage"
-        ></div>
-      </div>
-    </div>
-
     <!-- Description -->
     <p class="text-gray-300 text-sm leading-relaxed mb-5">{{ result().descripcion }}</p>
 
@@ -56,17 +42,17 @@
   <div class="flex flex-col sm:flex-row gap-3">
     <button
       (click)="retake.emit()"
-      class="flex-1 py-3 rounded-lg border border-hp-border text-gray-400 hover:text-gray-200 hover:border-gray-500 transition-all duration-200 text-sm font-medium flex items-center justify-center gap-2"
+      class="flex-1 min-w-0 py-3 px-4 rounded-lg border border-hp-border text-gray-400 hover:text-gray-200 hover:border-gray-500 transition-all duration-200 text-sm font-medium flex items-center justify-center gap-2"
     >
-      <lucide-icon name="rotate-ccw" class="w-4 h-4"></lucide-icon>
-      <span>Retake test</span>
+      <lucide-icon name="rotate-ccw" class="w-4 h-4 shrink-0"></lucide-icon>
+      <span class="truncate">Retake test</span>
     </button>
     <button
       (click)="startChat()"
-      class="flex-1 hp-btn-primary text-center py-3 rounded-lg flex items-center justify-center gap-2"
+      class="flex-1 min-w-0 hp-btn-primary !px-4 text-center !py-3 rounded-lg flex items-center justify-center gap-2"
     >
-      <lucide-icon name="message-circle" class="w-4 h-4"></lucide-icon>
-      <span>Chat with my character</span>
+      <lucide-icon name="message-circle" class="w-4 h-4 shrink-0"></lucide-icon>
+      <span class="truncate">Chat with my character</span>
     </button>
   </div>
 

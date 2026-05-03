@@ -7,6 +7,7 @@ import { CharacterService } from '../../../../core/services/character.service';
   selector: 'app-message-bubble',
   standalone: true,
   imports: [LucideAngularModule],
+  host: { class: 'block' },
   template: `
     <div
       class="flex items-end gap-2 animate-slide-up"
@@ -21,7 +22,7 @@ import { CharacterService } from '../../../../core/services/character.service';
 
       <!-- Burbuja -->
       <div
-        class="max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed"
+        class="relative max-w-[85%] sm:max-w-[75%] px-3 pt-2 pb-1.5 rounded-2xl text-sm leading-relaxed"
         [class.bg-hp-gold]="message().role === 'user'"
         [class.text-hp-dark]="message().role === 'user'"
         [class.rounded-br-sm]="message().role === 'user'"
@@ -32,10 +33,11 @@ import { CharacterService } from '../../../../core/services/character.service';
         [class.text-gray-100]="message().role === 'assistant'"
         [class.rounded-bl-sm]="message().role === 'assistant'"
       >
-        {{ mainText() }}
+        <!-- Spacer invisible al final del texto para que la hora no tape el contenido -->
+        <span>{{ mainText() }}<span class="invisible text-[10px] pl-8">{{ formatTime(message().createdAt) }}</span></span>
 
         @if (sources().length > 0) {
-          <div class="mt-3 pt-3 border-t border-hp-border/50">
+          <div class="mt-2 pt-2 border-t border-hp-border/50">
             <p class="text-[10px] text-hp-muted font-heading tracking-wider uppercase mb-1.5">📚 Sources</p>
             @for (source of sources(); track source) {
               <p class="text-[10px] text-hp-muted/70 leading-relaxed">• {{ source }}</p>
@@ -43,12 +45,10 @@ import { CharacterService } from '../../../../core/services/character.service';
           </div>
         }
 
-        <p
-          class="text-[10px] mt-2 opacity-60"
-          [class.text-right]="message().role === 'user'"
-        >
+        <!-- Hora flotando abajo a la derecha -->
+        <span class="absolute bottom-1.5 right-2.5 text-[10px] opacity-50 leading-none">
           {{ formatTime(message().createdAt) }}
-        </p>
+        </span>
       </div>
     </div>
   `,

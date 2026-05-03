@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{html,ts}'],
+  safelist: ['-translate-x-full'],
   theme: {
     extend: {
       colors: {
@@ -19,16 +20,20 @@ module.exports = {
       },
       fontFamily: {
         heading: ['"Cinzel"', 'serif'],
-        body:    ['"Inter"', 'sans-serif'],
+        body:    ['"Cinzel"', 'serif'],
+        sans:    ['"Cinzel"', 'serif'],
+        serif:   ['"Cinzel"', 'serif'],
       },
       animation: {
-        'spin-slow': 'spin 3s linear infinite',
-        'fade-in':   'fadeIn 0.3s ease-in-out',
-        'slide-up':  'slideUp 0.3s ease-out',
+        'spin-slow':      'spin 3s linear infinite',
+        'fade-in':        'fadeIn 0.3s ease-in-out',
+        'slide-up':       'slideUp 0.3s ease-out',
+        'slide-in-left':  'slideInLeft 0.25s ease-out',
       },
       keyframes: {
-        fadeIn:  { from: { opacity: '0' }, to: { opacity: '1' } },
-        slideUp: { from: { opacity: '0', transform: 'translateY(12px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+        fadeIn:      { from: { opacity: '0' }, to: { opacity: '1' } },
+        slideUp:     { from: { opacity: '0', transform: 'translateY(12px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+        slideInLeft: { from: { transform: 'translateX(-100%)' }, to: { transform: 'translateX(0)' } },
       },
     },
   },

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ChatService } from '../../services/chat.service';
@@ -21,6 +21,8 @@ export class ChatSidebarComponent {
   readonly activeChat = this.chatService.activeChat;
   readonly characters = this.characterService.characters;
 
+  close = output<void>();
+
   showCharacterPicker = signal(false);
   deletingId          = signal<string | null>(null);
 
@@ -28,11 +30,13 @@ export class ChatSidebarComponent {
     const chat = this.chatService.createChat(characterId);
     this.showCharacterPicker.set(false);
     this.router.navigate(['/chat', chat.id]);
+    this.close.emit();
   }
 
   selectChat(chatId: string): void {
     this.chatService.setActiveChat(chatId);
     this.router.navigate(['/chat', chatId]);
+    this.close.emit();
   }
 
   deleteChat(event: Event, chatId: string): void {

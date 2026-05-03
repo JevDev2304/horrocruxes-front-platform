@@ -1,25 +1,23 @@
-<div class="flex items-end gap-3">
-  <div class="flex-1 relative">
-    <textarea
-      #textarea
-      [ngModel]="text()"
-      (ngModelChange)="text.set($event); autoResize()"
-      (keydown)="onKeydown($event)"
-      [disabled]="disabled()"
-      placeholder="Write your message... (Enter to send, Shift+Enter for new line)"
-      rows="1"
-      class="w-full bg-hp-surface border border-hp-border hover:border-hp-border/80 focus:border-hp-gold/60 focus:ring-1 focus:ring-hp-gold/30
-             rounded-xl px-4 py-3 text-sm text-gray-100 placeholder-hp-muted resize-none
-             transition-all duration-200 outline-none leading-relaxed
-             disabled:opacity-50 disabled:cursor-not-allowed"
-      style="max-height: 160px;"
-    ></textarea>
-  </div>
+<div class="relative">
+  <textarea
+    #textarea
+    [ngModel]="text()"
+    (ngModelChange)="text.set($event); autoResize()"
+    (keydown)="onKeydown($event)"
+    [disabled]="disabled()"
+    placeholder="Write your message..."
+    rows="1"
+    class="w-full bg-hp-surface border border-hp-border hover:border-hp-border/80 focus:border-hp-gold/60 focus:ring-1 focus:ring-hp-gold/30
+           rounded-xl px-4 py-3 pr-14 text-sm text-gray-100 placeholder-hp-muted resize-none overflow-y-hidden
+           transition-all duration-200 outline-none leading-relaxed
+           disabled:opacity-50 disabled:cursor-not-allowed"
+    style="max-height: 160px;"
+  ></textarea>
 
   <button
     (click)="submit()"
     [disabled]="disabled() || !text().trim()"
-    class="flex-shrink-0 w-11 h-11 rounded-xl bg-hp-gold hover:bg-hp-gold-light
+    class="absolute right-2 bottom-3 w-9 h-9 rounded-lg bg-hp-gold hover:bg-hp-gold-light
            flex items-center justify-center text-hp-dark
            transition-all duration-200 active:scale-95
            disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-hp-gold"
