@@ -34,6 +34,7 @@ cp src/environments/environment.example.ts src/environments/environment.ts
 # Fill in your Cognito credentials in environment.ts
 
 npm start
+# → http://localhost:4200
 ```
 
 App will be available at:
