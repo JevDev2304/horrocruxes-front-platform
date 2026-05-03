@@ -9,7 +9,6 @@ Harry Potter themed chat app. Talk with iconic HP characters powered by a multi-
 * 🧠 **Character Chat** — conversations with Dumbledore, Hermione, Ron, Snape, or Luna, each with unique personality and tone
 * 🧩 **HP Quiz** — 9-question personality test to discover your matching character
 * 🔐 **Authentication** — secure login/registration via AWS Cognito
-* ☁️ **Cloud Deployment** — frontend hosted on AWS (S3 + CloudFront)
 * ⚙️ **CI/CD Pipeline** — automated build & deploy using GitHub Actions
 
 ---
