@@ -18,8 +18,6 @@ Harry Potter themed chat app. Talk with iconic HP characters powered by a multi-
 * Tailwind CSS
 * Lucide Icons
 * Amazon Cognito (authentication)
-* Amazon S3 + Amazon CloudFront (hosting)
-* GitHub Actions (CI/CD)
 
 ---
 
