@@ -1,95 +1,218 @@
-# Horrocruxes — Frontend
+# 🧙‍♂️ Horrocruxes
 
-> Harry Potter themed AI chat platform. Chat with iconic HP characters, each powered by a multi-agent RAG system that answers in character using real book knowledge.
-
----
-
-## What it does
-
-Users register, take a personality quiz (Sorting Hat style), and are matched to a Harry Potter character. They can then chat with that character — or any other — through a conversational interface where each response cites the actual book chapters used as context.
-
-**Core flows:**
-- **Auth** — Register / confirm / login via AWS Cognito
-- **Quiz** — 9-question personality test → character match with % score, house, traits, and a character quote
-- **Chat** — Multi-conversation interface with any HP character; responses include cited sources from the books
+Harry Potter themed chat app. Talk with iconic HP characters powered by a multi-agent AI system.
 
 ---
 
-## Architecture overview
+## ✨ Features
 
-This repo is the **frontend layer** of a three-tier system:
-
-```
-Angular SPA (this repo)
-    └─► Business API  (FastAPI · RDS/PostgreSQL)
-            └─► AI Lambda  (Multi-agent · RAG · NVIDIA/Gemma 4 31B)
-```
-
-The frontend communicates only with the Business API. JWT tokens from Cognito are attached to every request via an HTTP interceptor. The multi-agent + RAG layer is fully encapsulated in the Lambda.
+* 🧠 **Character Chat** — conversations with Dumbledore, Hermione, Ron, Snape, or Luna, each with unique personality and tone
+* 🧩 **HP Quiz** — 9-question personality test to discover your matching character
+* 🔐 **Authentication** — secure login/registration via AWS Cognito
+* ☁️ **Cloud Deployment** — frontend hosted on AWS (S3 + CloudFront)
+* ⚙️ **CI/CD Pipeline** — automated build & deploy using GitHub Actions
 
 ---
 
-## Tech stack
+## 🛠 Tech Stack
 
-| Layer | Tech |
-|---|---|
-| Framework | Angular 19 (standalone components) |
-| Styling | Tailwind CSS |
-| Icons | Lucide Angular |
-| Auth | AWS Cognito — JWT via `@aws-sdk/client-cognito-identity-provider` |
-| HTTP | Angular `HttpClient` + auth interceptor |
-| Routing | Lazy-loaded feature modules with `authGuard` |
+* Angular 19
+* Tailwind CSS
+* Lucide Icons
+* Amazon Cognito (authentication)
+* Amazon S3 + Amazon CloudFront (hosting)
+* GitHub Actions (CI/CD)
 
 ---
 
-## Project structure
-
-```
-src/app/
-├── core/
-│   ├── auth/         # Cognito service, auth guard, HTTP interceptor
-│   └── services/     # Character service (S3 image resolution)
-├── features/
-│   ├── auth/         # Login, register, confirm-signup pages
-│   ├── chat/         # Chat page, sidebar, message bubbles, input
-│   └── quiz/         # Quiz form, results page
-└── shared/
-    ├── components/   # Reusable UI (loading overlay, etc.)
-    └── models/       # TypeScript interfaces (User, Chat, Quiz)
-```
-
-Feature modules are lazy-loaded. All protected routes require a valid Cognito JWT enforced by `authGuard`.
-
----
-
-## Local setup
+## 🚀 Getting Started
 
 ```bash
 npm install
+
 cp src/environments/environment.example.ts src/environments/environment.ts
 # Fill in your Cognito credentials in environment.ts
+
 npm start
 # → http://localhost:4200
 ```
 
-**environment.ts fields:**
+App will be available at:
 
-```ts
-{
-  apiUrl: 'http://localhost:8000',   // Business API base URL
-  cognito: {
-    region: 'us-east-1',
-    userPoolId: 'YOUR_USER_POOL_ID',
-    clientId: 'YOUR_CLIENT_ID',
-  }
-}
+```bash
+http://localhost:4200
 ```
 
 ---
 
-## Key design decisions
+## 🔐 Environment Configuration
 
-- **Lazy loading** on all feature routes keeps the initial bundle small.
-- **Auth interceptor** automatically appends the Cognito JWT to every API request — no manual token handling in services.
-- **Standalone components** (Angular 19) — no NgModules, cleaner dependency graph.
-- **Responsive** — layout adapts from mobile to desktop; chat uses a collapsible sidebar pattern.
+Edit:
+
+```bash
+src/environments/environment.ts
+```
+
+Example:
+
+```ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:8000',
+
+  cognito: {
+    region: 'us-east-1',
+    userPoolId: 'YOUR_USER_POOL_ID',
+    clientId: 'YOUR_CLIENT_ID',
+    domain: 'https://your-domain.auth.us-east-1.amazoncognito.com',
+    redirectSignIn: 'http://localhost:4200',
+    redirectSignOut: 'http://localhost:4200',
+  },
+};
+```
+
+---
+
+## ⚙️ CI/CD with GitHub Actions
+
+This project includes a deployment pipeline that:
+
+1. Installs dependencies
+2. Builds the Angular app
+3. Uploads static files to S3
+4. Invalidates CloudFront cache
+
+### 🔑 Requirements
+
+* AWS IAM Role (recommended via OIDC)
+* S3 bucket configured for hosting
+* CloudFront distribution
+* GitHub repository secrets or OIDC role configured
+
+### 📦 Workflow Overview
+
+```yaml
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    steps:
+      - build Angular app
+      - upload to S3
+      - invalidate CloudFront
+```
+
+---
+
+## 🌐 Deployment Architecture
+
+```text
+GitHub → GitHub Actions → S3 → CloudFront → Users
+```
+
+Optional backend:
+
+```text
+Angular → /api → ALB → ECS Fargate
+```
+
+---
+
+## 🧪 Troubleshooting
+
+### ❌ Angular build fails (environment not found)
+
+```bash
+Could not resolve environments/environment
+```
+
+**Fix:**
+
+* Ensure files exist:
+
+  ```bash
+  src/environments/environment.ts
+  src/environments/environment.prod.ts
+  ```
+* Commit them to the repo
+
+---
+
+### ❌ AWS credentials error (GitHub Actions)
+
+```bash
+Credentials could not be loaded
+Did you mean to set the id-token permission?
+```
+
+**Fix (OIDC):**
+
+```yaml
+permissions:
+  id-token: write
+  contents: read
+```
+
+---
+
+### ❌ Cognito login redirect fails
+
+**Check:**
+
+* Callback URLs match exactly:
+
+  ```bash
+  http://localhost:4200
+  https://your-domain.com
+  ```
+* Domain is correct:
+
+  ```bash
+  https://<your-domain>.auth.us-east-1.amazoncognito.com
+  ```
+
+---
+
+### ❌ Angular routes return 404 on refresh
+
+**Fix CloudFront:**
+
+* Add custom error responses:
+
+  * 403 → `/index.html`
+  * 404 → `/index.html`
+
+---
+
+### ❌ API calls fail in production
+
+**Check:**
+
+* `apiUrl` in `environment.prod.ts`
+* CORS settings in backend
+* Use `/api` path with CloudFront routing if possible
+
+---
+
+## 📌 Future Improvements
+
+* Environment variable injection at runtime
+* Multi-environment deployments (dev/staging/prod)
+* JWT validation in backend (Fargate)
+* Observability (logs + metrics)
+
+---
+
+## 🤝 Contributing
+
+PRs and issues are welcome!
+Feel free to suggest improvements or report bugs.
+
+---
+
+## ⚡ License
+
+MIT
+

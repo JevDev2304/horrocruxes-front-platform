@@ -1,0 +1,53 @@
+name: Deploy Angular to AWS
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # Necesario para OIDC
+      contents: read    # Necesario para actions/checkout
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Angular app
+        run: npx ng build --configuration production
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # Upload static assets with long cache
+      - name: Upload static assets
+        run: |
+          aws s3 sync dist/horrocruxes/browser/ s3://horrocruxes-harrypotter-rag.me \
+            --delete \
+            --exclude "index.html" \
+            --cache-control "max-age=31536000,public"
+      
+      # Upload index.html with no cache
+      - name: Upload index.html
+        run: |
+          aws s3 cp dist/horrocruxes/browser/index.html \
+            s3://horrocruxes-harrypotter-rag.me/index.html \
+            --cache-control "no-cache"
+
+      - name: CloudFront Invalidation
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.DIST_ID }} \
+            --paths "/index.html"
