@@ -20,7 +20,9 @@ module.exports = {
       },
       fontFamily: {
         heading: ['"Cinzel"', 'serif'],
-        body:    ['"Inter"', 'sans-serif'],
+        body:    ['"Cinzel"', 'serif'],
+        sans:    ['"Cinzel"', 'serif'],
+        serif:   ['"Cinzel"', 'serif'],
       },
       animation: {
         'spin-slow':      'spin 3s linear infinite',
