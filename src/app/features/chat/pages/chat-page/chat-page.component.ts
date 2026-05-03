@@ -19,7 +19,9 @@ export class ChatPageComponent implements OnInit {
     this.sidebarOpen.update(v => !v);
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await this.chatService.syncFromBackend();
+
     const id = this.chatId();
     if (id) {
       this.chatService.setActiveChat(id);

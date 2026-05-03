@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { BackendChatTurnResponse, Chat, HpCharacter, Message } from '../../../shared/models/chat.model';
+import { BackendChatHistoryResponse, BackendChatOut, BackendChatTurnResponse, BackendUserChatsResponse, Chat, HpCharacter, Message } from '../../../shared/models/chat.model';
 import { environment } from '../../../../environments/environment';
 
 const CHATS_KEY    = 'hp_chats';
@@ -63,6 +63,8 @@ export class ChatService {
   }
 
   deleteChat(chatId: string): void {
+    const chat = this._chats().find(c => c.id === chatId);
+
     const updated = this._chats().filter((c) => c.id !== chatId);
     this.persistChats(updated);
 
@@ -73,6 +75,10 @@ export class ChatService {
     const msgs = { ...this._messages() };
     delete msgs[chatId];
     this.persistMessages(msgs);
+
+    if (chat?.backendChatId != null) {
+      this.http.delete(`${environment.apiUrl}/chat/${chat.backendChatId}`).subscribe({ error: () => {} });
+    }
   }
 
   renameChat(chatId: string, title: string): void {
@@ -125,6 +131,73 @@ export class ChatService {
       this._sendingChats.update((s) => { const n = { ...s }; delete n[chatId]; return n; });
       this.touchChat(chatId);
     }
+  }
+
+  async syncFromBackend(): Promise<void> {
+    try {
+      const { chats: backendChats } = await firstValueFrom(
+        this.http.get<BackendUserChatsResponse>(`${environment.apiUrl}/chat/`)
+      );
+
+      if (!backendChats.length) return;
+
+      const existing = this._chats();
+      const byBackendId = new Map(
+        existing.filter(c => c.backendChatId != null).map(c => [c.backendChatId!, c])
+      );
+
+      const mergedChats: Chat[] = [...existing];
+      for (const bc of backendChats) {
+        if (!byBackendId.has(bc.id)) {
+          mergedChats.push({
+            id:            crypto.randomUUID(),
+            title:         'Conversation',
+            character:     bc.character,
+            createdAt:     bc.created_at,
+            lastMessageAt: bc.created_at,
+            backendChatId: bc.id,
+          });
+        }
+      }
+      this.persistChats(mergedChats);
+
+      const currentMsgs = this._messages();
+      for (const chat of this._chats()) {
+        if (!chat.backendChatId) continue;
+        if ((currentMsgs[chat.id] ?? []).length > 0) continue;
+
+        try {
+          const history = await firstValueFrom(
+            this.http.get<BackendChatHistoryResponse>(
+              `${environment.apiUrl}/chat/${chat.backendChatId}/history`
+            )
+          );
+
+          if (!history.messages.length) continue;
+
+          const msgs: Message[] = history.messages.map(m => ({
+            id:        String(m.id),
+            chatId:    chat.id,
+            role:      m.role,
+            content:   m.content,
+            createdAt: m.created_at,
+          }));
+
+          this.persistMessages({ ...this._messages(), [chat.id]: msgs });
+
+          const lastMsg = msgs[msgs.length - 1];
+          const firstUserMsg = msgs.find(m => m.role === 'user');
+          const updatedChats = this._chats().map(c => {
+            if (c.id !== chat.id) return c;
+            const title = c.title === 'New conversation' || c.title === 'Conversation'
+              ? (firstUserMsg ? firstUserMsg.content.slice(0, 40) : c.title)
+              : c.title;
+            return { ...c, title, lastMessageAt: lastMsg.createdAt };
+          });
+          this.persistChats(updatedChats);
+        } catch { /* ignore per-chat failures */ }
+      }
+    } catch { /* ignore if backend unreachable */ }
   }
 
   // ─── Helpers ───────────────────────────────────────────────────────────────

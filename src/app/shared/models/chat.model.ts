@@ -38,3 +38,18 @@ export interface BackendChatTurnResponse {
   user_message: BackendMessageOut;
   assistant_message: BackendMessageOut;
 }
+
+export interface BackendChatOut {
+  id: number;
+  character: string;
+  created_at: string;
+}
+
+export interface BackendUserChatsResponse {
+  chats: BackendChatOut[];
+}
+
+export interface BackendChatHistoryResponse {
+  chat_id: number;
+  messages: BackendMessageOut[];
+}
