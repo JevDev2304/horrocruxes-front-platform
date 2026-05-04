@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://www.horrocruxes-harrypotter-rag.me/api', // or '/api' if using CloudFront routing
-
+  apiUrl: '/api',
+  
   cognito: {
     region: 'us-east-1',
     userPoolId: 'us-east-1_VmpTThD7q',
