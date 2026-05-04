@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: '/api',
+  apiUrl: 'https://api.horrocruxes-harrypotter-rag.me',
   
   cognito: {
     region: 'us-east-1',
