@@ -50,4 +50,4 @@ jobs:
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.DIST_ID }} \
-            --paths "/index.html"
+            --paths "/*"
